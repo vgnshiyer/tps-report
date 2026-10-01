@@ -1,0 +1,14 @@
+{
+  "name": "vgnshiyer",
+  "owner": {
+    "name": "vgnshiyer"
+  },
+  "description": "vgnshiyer's Claude Code mods",
+  "plugins": [
+    {
+      "name": "tps-report",
+      "source": "./",
+      "description": "Bill from management drops by above the prompt while Claude works. A parody."
+    }
+  ]
+}

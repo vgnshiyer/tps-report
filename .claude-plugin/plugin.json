@@ -1,0 +1,25 @@
+{
+  "name": "tps-report",
+  "version": "0.1.0",
+  "description": "Bill from management drops by above the prompt while Claude works, and the spinner starts preparing TPS reports. A parody.",
+  "author": {
+    "name": "vgnshiyer"
+  },
+  "homepage": "https://github.com/vgnshiyer/tps-report",
+  "repository": "https://github.com/vgnshiyer/tps-report",
+  "userConfig": {
+    "name": {
+      "type": "string",
+      "title": "Boss's name",
+      "description": "The name over the boss's speech bubble",
+      "default": "Bill"
+    },
+    "pingEverySeconds": {
+      "type": "number",
+      "title": "Seconds between visits",
+      "description": "About how often Bill drops by while Claude works, and how often the spinner turns to TPS reports. Each gap is random, from half to one and a half times this.",
+      "default": 90,
+      "min": 10
+    }
+  }
+}
