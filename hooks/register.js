@@ -1,9 +1,12 @@
 // tps-report: Bill from management drops by above the prompt while Claude works.
 // Purely cosmetic: no hook here touches prompts, tool calls, or what Claude reads.
+import { PNG } from './bill-art.js'
 import { COLUMNS, FRAMES, ROWS } from './sprite.js'
 import { LINES, SPINNER } from './lines.js'
 
 const VISIT_SECONDS = 15 // how long Bill stays each time he drops by
+const IMAGE_COLUMNS = 14 // Bill's picture (7:6) over 14 × 6 cells, which keeps its shape in a 1:2 cell
+const IMAGE_ROWS = 6
 const SPINNER_SECONDS = 15 // how long the spinner reads "Preparing TPS reports"
 
 let name = 'Bill'
@@ -20,6 +23,7 @@ let line = ''
 let frame = 'idle'
 let bandId = null
 let bag = []
+let images = false // whether the terminal can show images
 
 // A random gap of half to one and a half times the average, in whole seconds
 function gap() {
@@ -38,11 +42,12 @@ function nextLine() {
   return bag.pop()
 }
 
-// Repaints the sprite without a redraw
+// Swaps Bill's frame without a redraw
 function show($, next) {
   frame = next
   if (bandId === null || visitLeft === 0) return
-  $.ui.blit({ requestId: bandId, key: 'bill', cells: FRAMES[frame] }).catch(() => {})
+  const look = images ? { source: { png: PNG[frame] } } : { cells: FRAMES[frame] }
+  $.ui.blit({ requestId: bandId, key: 'bill', ...look }).catch(() => {})
 }
 
 // Flaps his mouth for a second and a half
@@ -98,6 +103,10 @@ export function register(on, options) {
   nextSpinnerAt = gap()
 
   on('session.start', async ($, e, next) => {
+    // Ghostty and kitty draw real images; other terminals get the half-block sprite
+    const term = await $.env.get('TERM_PROGRAM')
+    const kitty = await $.env.get('KITTY_WINDOW_ID')
+    images = term === 'ghostty' || Boolean(kitty)
     $.clock.every(1000, () => tick($))
     return next(e)
   })
@@ -121,11 +130,11 @@ export function register(on, options) {
     return next({ ...e, props: { ...e.props, message: SPINNER } })
   })
 
-  // Raster is terminal-only, so Bill only shows up there
+  // Image and Raster are terminal-only, so Bill only shows up there
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     if (line === '' || e.surface !== 'terminal' || e.props.hasSurvey) return next(e)
     bandId = e.requestId
-    const { Box, Text, Raster } = $.ui.resolve(e)
+    const { Box, Text, Raster, Image } = $.ui.resolve(e)
     const room = Math.max(16, Math.min(56, e.props.bodyColumns - 20))
     const bubble = Box({
       borderStyle: 'round',
@@ -145,7 +154,9 @@ export function register(on, options) {
           alignItems: 'flex-end',
           children: [Text({ bold: true, children: [name + ' · Management'] }), bubble],
         }),
-        Raster({ key: 'bill', columns: COLUMNS, rows: ROWS, cells: FRAMES[frame] }),
+        images
+          ? Image({ key: 'bill', source: { png: PNG[frame] }, columns: IMAGE_COLUMNS, rows: IMAGE_ROWS, alt: name })
+          : Raster({ key: 'bill', columns: COLUMNS, rows: ROWS, cells: FRAMES[frame] }),
       ],
     })
     return Box({ flexDirection: 'column', children: [bill, await next(e)] })

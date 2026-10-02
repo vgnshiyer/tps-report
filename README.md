@@ -2,7 +2,7 @@
 
 Bill from management drops by while Claude works.
 
-<!-- demo GIF goes here -->
+![Bill dropping by while Claude Code works on a login rate limiter](screenshot.png)
 
 A Claude Code mod. While Claude works, Bill pops up above the prompt at random moments with a line about TPS reports, cover sheets, or coming in on Saturday, then wanders off. Every so often, the spinner switches to "Preparing TPS reports…".
 
@@ -23,7 +23,7 @@ Or load a clone for one session:
 claude --plugin-dir ./tps-report
 ```
 
-Bill is drawn in terminal pixels, so he shows up in the Claude Code CLI only, not in the Desktop app.
+In Ghostty and kitty, Bill shows up as a real picture. Other terminals get a smaller pixel version of him. He lives in the Claude Code CLI only, not the Desktop app.
 
 ## Config
 
@@ -36,10 +36,10 @@ Set these in `/config`:
 
 ## Add a line
 
-Bill's lines are in `hooks/lines.js`. PRs with your own boss's catchphrases are welcome.
+Bill's lines are in `hooks/lines.js`. PRs with your own boss's catchphrases are welcome. His picture is `art/bill.png`; after changing it, run `python3 art/build.py` to rebuild the frames.
 
 ---
 
 Tested on Claude Code 2.1.287.
 
-A parody, not affiliated with or endorsed by the makers of *Office Space*. Bill is an original character.
+A parody, not affiliated with or endorsed by the makers of *Office Space*.

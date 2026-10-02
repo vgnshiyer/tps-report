@@ -1,4 +1,5 @@
 import { expect, mock, test } from 'claude-code/testing'
+import { PNG } from '../hooks/bill-art.js'
 import { LINES, SPINNER } from '../hooks/lines.js'
 
 const BAND = {
@@ -19,8 +20,9 @@ const TURN = { text: 'refactor auth', turnId: 't1' }
 const DONE = { turnId: 't1', answer: 'done', durationMs: 60000, isAborted: false, reason: 'answer', usage: null } as const
 
 // Stands in for Claude Code: answers what the mod passes on, and draws the spinner's own text
-function engine(on) {
+function engine(on, env = {}) {
   const clock = mock.clock(on)
+  mock.env(on, env)
   on('session.start', () => ({ cwd: '/work' }))
   on('turn.start', ($, e) => ({ turnId: e.turnId }))
   on('turn.complete', () => ({ text: '' }))
@@ -33,7 +35,7 @@ function engine(on) {
   return clock
 }
 
-test("Bill says hello early in Claude's first work, then leaves",{ options: { pingEverySeconds: 10 } }, async ($, on) => {
+test("Bill says hello early in Claude's first work, then leaves", { options: { pingEverySeconds: 10 } }, async ($, on) => {
   const clock = engine(on)
   await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
   const band = await $.ui.mount(BAND)
@@ -123,4 +125,24 @@ test("never touches the prompt or Claude's tool calls", { options: { pingEverySe
   await clock.advance(30000)
   expect(prompt.context).toBeUndefined()
   expect(await $.tool.call({ tool: 'Bash', command: 'npm test' })).toEqual({ result: 'ok' })
+})
+
+test('in Ghostty, Bill is a real image', { options: { pingEverySeconds: 10 } }, async ($, on) => {
+  const clock = engine(on, { TERM_PROGRAM: 'ghostty' })
+  await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
+  const band = await $.ui.mount(BAND)
+  await $.turn.start(TURN)
+  await clock.advance(10000)
+  const bill = await band.find({ key: 'bill' })
+  expect(bill?.type).toBe('Image')
+  expect(Object.values(PNG)).toContain((bill?.props.source as { png: string }).png)
+})
+
+test('in other terminals, Bill is the half-block sprite', { options: { pingEverySeconds: 10 } }, async ($, on) => {
+  const clock = engine(on, { TERM_PROGRAM: 'Apple_Terminal' })
+  await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
+  const band = await $.ui.mount(BAND)
+  await $.turn.start(TURN)
+  await clock.advance(10000)
+  expect((await band.find({ key: 'bill' }))?.type).toBe('Raster')
 })

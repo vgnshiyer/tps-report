@@ -1,7 +1,8 @@
-// Bill as a 16×10 pixel sprite, drawn as 16 columns × 5 rows of ▀/▄ half-block cells.
+// The small Bill for terminals that can't show images: a 16×10 sprite, drawn as
+// 16 columns × 5 rows of ▀/▄ half-block cells.
 // One character per pixel; '.' is transparent.
 const PALETTE = {
-  H: 0xb4b4b4, h: 0x7c7c7c, I: 0xdcdcdc, // hair, its shadow and shine
+  H: 0x704c2d, h: 0x4a301b, I: 0x8f6740, // hair, its shadow and shine
   S: 0xf2c18d, s: 0xd99a6c, // skin, shadow
   G: 0x5a5a5a, L: 0xd6ecff, E: 0x1b1b1b, // glasses frame, lens, pupil
   m: 0xa4553f, O: 0x4a1410, // mouth closed, open

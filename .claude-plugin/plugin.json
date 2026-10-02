@@ -1,6 +1,6 @@
 {
   "name": "tps-report",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Bill from management drops by above the prompt while Claude works, and the spinner starts preparing TPS reports. A parody.",
   "author": {
     "name": "vgnshiyer"
