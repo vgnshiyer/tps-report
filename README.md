@@ -25,6 +25,8 @@ claude --plugin-dir ./tps-report
 
 In Ghostty, kitty, and the Code tab of the Claude desktop app, Bill shows up as a real picture. Other terminals get a smaller pixel version of him.
 
+![Bill dropping by above the prompt in the Claude desktop app](screenshot-desktop.png)
+
 ## Config
 
 Set these in `/config`:
