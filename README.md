@@ -2,6 +2,8 @@
 
 Bill from management drops by while Claude works.
 
+<img width="1005" height="313" alt="image" src="https://github.com/user-attachments/assets/6e587905-4431-406c-961b-29b556687b88" />
+
 ![Bill dropping by while Claude Code works on a login rate limiter](screenshot.png)
 
 A Claude Code mod. While Claude works, Bill pops up above the prompt at random moments with a line about TPS reports, cover sheets, or coming in on Saturday, then wanders off. Every so often, the spinner switches to "Preparing TPS reports…".
@@ -24,8 +26,6 @@ claude --plugin-dir ./tps-report
 ```
 
 In Ghostty, kitty, and the Code tab of the Claude desktop app, Bill shows up as a real picture. Other terminals get a smaller pixel version of him.
-
-![Bill dropping by above the prompt in the Claude desktop app](screenshot-desktop.png)
 
 ## Config
 
