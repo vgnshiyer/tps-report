@@ -23,7 +23,7 @@ Or load a clone for one session:
 claude --plugin-dir ./tps-report
 ```
 
-In Ghostty and kitty, Bill shows up as a real picture. Other terminals get a smaller pixel version of him. He lives in the Claude Code CLI only, not the Desktop app.
+In Ghostty, kitty, and the Code tab of the Claude desktop app, Bill shows up as a real picture. Other terminals get a smaller pixel version of him.
 
 ## Config
 
@@ -40,6 +40,6 @@ Bill's lines are in `hooks/lines.js`. PRs with your own boss's catchphrases are 
 
 ---
 
-Tested on Claude Code 2.1.287.
+Tested on Claude Code 2.1.287 and the desktop app's Claude Code 2.1.286.
 
 A parody, not affiliated with or endorsed by the makers of *Office Space*.

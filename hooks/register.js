@@ -7,6 +7,8 @@ import { LINES, SPINNER } from './lines.js'
 const VISIT_SECONDS = 15 // how long Bill stays each time he drops by
 const IMAGE_COLUMNS = 14 // Bill's picture (7:6) over 14 × 6 cells, which keeps its shape in a 1:2 cell
 const IMAGE_ROWS = 6
+const SVG_WIDTH = 98 // the same picture in the desktop app, in CSS pixels
+const SVG_HEIGHT = 84
 const SPINNER_SECONDS = 15 // how long the spinner reads "Preparing TPS reports"
 
 let name = 'Bill'
@@ -21,7 +23,8 @@ let visitLeft = 0
 let spinnerLeft = 0
 let line = ''
 let frame = 'idle'
-let bandId = null
+let bandId = null // the terminal's band, where a new frame is swapped in place
+let redraws = false // whether the desktop app shows Bill, where a new frame takes a redraw
 let bag = []
 let images = false // whether the terminal can show images
 
@@ -42,12 +45,23 @@ function nextLine() {
   return bag.pop()
 }
 
-// Swaps Bill's frame without a redraw
+// The desktop app draws pictures as SVG, so Bill's PNG goes inside one
+function svg(frame) {
+  return (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 384">' +
+    `<image width="448" height="384" href="data:image/png;base64,${PNG[frame]}"/></svg>`
+  )
+}
+
+// Swaps Bill's frame: in place in the terminal, by a redraw in the desktop app
 function show($, next) {
   frame = next
-  if (bandId === null || visitLeft === 0) return
-  const look = images ? { source: { png: PNG[frame] } } : { cells: FRAMES[frame] }
-  $.ui.blit({ requestId: bandId, key: 'bill', ...look }).catch(() => {})
+  if (visitLeft === 0) return
+  if (bandId !== null) {
+    const look = images ? { source: { png: PNG[frame] } } : { cells: FRAMES[frame] }
+    $.ui.blit({ requestId: bandId, key: 'bill', ...look }).catch(() => {})
+  }
+  if (redraws) $.ui.invalidate('ui.render')
 }
 
 // Flaps his mouth for a second and a half
@@ -130,12 +144,22 @@ export function register(on, options) {
     return next({ ...e, props: { ...e.props, message: SPINNER } })
   })
 
-  // Image and Raster are terminal-only, so Bill only shows up there
+  // The terminal draws Bill as an Image or a Raster; the desktop app has neither, so there he's an Svg
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
-    if (line === '' || e.surface !== 'terminal' || e.props.hasSurvey) return next(e)
-    bandId = e.requestId
-    const { Box, Text, Raster, Image } = $.ui.resolve(e)
-    const room = Math.max(16, Math.min(56, e.props.bodyColumns - 20))
+    if (line === '' || e.props.hasSurvey) return next(e)
+    const { Box, Text, Raster, Image, Svg } = $.ui.resolve(e)
+    let picture
+    if (e.surface === 'terminal') {
+      bandId = e.requestId
+      picture = images
+        ? Image({ key: 'bill', source: { png: PNG[frame] }, columns: IMAGE_COLUMNS, rows: IMAGE_ROWS, alt: name })
+        : Raster({ key: 'bill', columns: COLUMNS, rows: ROWS, cells: FRAMES[frame] })
+    } else {
+      redraws = true
+      picture = Svg({ source: svg(frame), width: SVG_WIDTH, height: SVG_HEIGHT, alt: name })
+    }
+    const columns = Number.isFinite(e.props.bodyColumns) ? e.props.bodyColumns : 80
+    const room = Math.max(16, Math.min(56, columns - 20))
     const bubble = Box({
       borderStyle: 'round',
       borderColor: 'red',
@@ -154,9 +178,7 @@ export function register(on, options) {
           alignItems: 'flex-end',
           children: [Text({ bold: true, children: [name + ' · Management'] }), bubble],
         }),
-        images
-          ? Image({ key: 'bill', source: { png: PNG[frame] }, columns: IMAGE_COLUMNS, rows: IMAGE_ROWS, alt: name })
-          : Raster({ key: 'bill', columns: COLUMNS, rows: ROWS, cells: FRAMES[frame] }),
+        picture,
       ],
     })
     return Box({ flexDirection: 'column', children: [bill, await next(e)] })

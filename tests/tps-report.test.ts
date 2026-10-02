@@ -146,3 +146,49 @@ test('in other terminals, Bill is the half-block sprite', { options: { pingEvery
   await clock.advance(10000)
   expect((await band.find({ key: 'bill' }))?.type).toBe('Raster')
 })
+
+test('in the desktop app, Bill is the same picture inside an SVG, and his mouth moves', { options: { pingEverySeconds: 10 } }, async ($, on) => {
+  const clock = engine(on)
+  await $.session.start({ surface: null, isInteractive: false, cwd: '/work' })
+  const band = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  await $.turn.start(TURN)
+
+  // He says hello 3 to 10 seconds in, with his name and a line
+  let seconds = 0
+  while (seconds < 10 && !(await band.find({ type: 'Svg' }))) {
+    await clock.advance(1000)
+    seconds += 1
+  }
+  expect(await band.find({ type: 'Text', text: 'Bill · Management' })).toBeDefined()
+  const said = (await band.findAll({ type: 'Text' })).map((t) => t.text)
+  expect(said.some((t) => LINES.includes(t))).toBe(true)
+
+  // Each frame he's drawn in is one of the three PNGs, and while he talks they change
+  const frames = new Set<string>()
+  for (let i = 0; i < 8; i++) {
+    const source = (await band.find({ type: 'Svg' }))?.props.source as string
+    const png = Object.entries<string>(PNG).find(([, data]) => source.includes(data))?.[0]
+    expect(png).toBeDefined()
+    frames.add(png as string)
+    await clock.advance(250)
+  }
+  expect(frames.has('talk') && frames.has('idle')).toBe(true)
+
+  // He leaves when the visit is over
+  await $.turn.complete(DONE)
+  await clock.advance(15000)
+  expect(await band.find({ type: 'Svg' })).toBeUndefined()
+})
+
+test('in the desktop app, the spinner turns to TPS reports too', { options: { pingEverySeconds: 10 } }, async ($, on) => {
+  const clock = engine(on)
+  await $.session.start({ surface: null, isInteractive: false, cwd: '/work' })
+  const spinner = await $.ui.mount({ ...SPIN, surface: 'desktop' })
+  await $.turn.start(TURN)
+  let seconds = 0
+  while (seconds < 15 && !(await spinner.find({ type: 'Text', text: SPINNER }))) {
+    await clock.advance(1000)
+    seconds += 1
+  }
+  expect(await spinner.find({ type: 'Text', text: SPINNER })).toBeDefined()
+})
