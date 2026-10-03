@@ -16,7 +16,7 @@ In Claude Code:
 
 ```
 /plugin marketplace add vgnshiyer/mods
-/plugin install tps-report@vgnshiyer
+/plugin install tps-report@vgnshiyer-mods
 ```
 
 [vgnshiyer/mods](https://github.com/vgnshiyer/mods) lists my other mods too.
