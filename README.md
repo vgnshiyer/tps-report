@@ -15,9 +15,11 @@ Bill is just for show. He never touches your prompts, Claude's tool calls, or an
 In Claude Code:
 
 ```
-/plugin marketplace add vgnshiyer/tps-report
+/plugin marketplace add vgnshiyer/mods
 /plugin install tps-report@vgnshiyer
 ```
+
+[vgnshiyer/mods](https://github.com/vgnshiyer/mods) lists my other mods too.
 
 Or load a clone for one session:
 

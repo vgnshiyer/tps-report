@@ -9,6 +9,14 @@
       "name": "tps-report",
       "source": "./",
       "description": "Bill from management drops by above the prompt while Claude works. A parody."
+    },
+    {
+      "name": "nowloading",
+      "source": {
+        "source": "github",
+        "repo": "vgnshiyer/nowloading"
+      },
+      "description": "The line that animates while Claude works, redrawn as something from before: a VCR's on-screen display, a split-flap departure board, an hourglass."
     }
   ]
 }
